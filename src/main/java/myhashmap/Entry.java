@@ -1,3 +1,5 @@
+package myhashmap;
+
 public class Entry {
     private final Integer key;
     private Long value;

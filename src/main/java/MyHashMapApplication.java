@@ -1,3 +1,5 @@
+import myhashmap.MyHashMap;
+
 public class MyHashMapApplication {
     public static void main(String[] args) {
         MyHashMap myHashMap = new MyHashMap();

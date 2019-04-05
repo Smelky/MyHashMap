@@ -1,7 +1,8 @@
+package myhashmap;
+
 public class MyHashMap {
     private static final float LOAD_FACTOR = 0.75f;
-    private static final int CAPACITY = 16;
-    private Entry[] table = new Entry[CAPACITY];
+    private Entry[] table = new Entry[16];
 
     public MyHashMap() {
         setAllElementsAsNull(this.table);
@@ -12,7 +13,6 @@ public class MyHashMap {
             table[i] = null;
         }
     }
-
 
     public void put(Integer key, long value) {
         Entry entry = new Entry(key, value);
@@ -85,13 +85,13 @@ public class MyHashMap {
     }
 
     private void changeTableCapacity() {
-            if (size() == (table.length * LOAD_FACTOR)) {
-                changeCapacity();
-            }
+        if (size() == (table.length * LOAD_FACTOR)) {
+            changeCapacity();
         }
+    }
 
     private void changeCapacity() {
-        Entry[] table = new Entry[CAPACITY * 2];
+        Entry[] table = new Entry[this.table.length * 2];
         setAllElementsAsNull(table);
         System.arraycopy(this.table, 0, table, 0, this.table.length);
         this.table = table.clone();
