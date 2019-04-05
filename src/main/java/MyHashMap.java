@@ -2,7 +2,16 @@ public class MyHashMap {
     private static final float LOAD_FACTOR = 0.75f;
     private static final int CAPACITY = 16;
     private Entry[] table = new Entry[CAPACITY];
-    private int size;
+
+    public MyHashMap() {
+        setAllElementsAsNull(this.table);
+    }
+
+    private void setAllElementsAsNull(Entry[] table) {
+        for (int i = 0; i < table.length; i++) {
+            table[i] = null;
+        }
+    }
 
 
     public void put(Integer key, long value) {
@@ -10,29 +19,65 @@ public class MyHashMap {
         changeTableCapacity();
 
         if (table[indexFor(key.hashCode(), table.length)] != null) {
-            for (int j = 0; j < table.length; j++) {
-                if (table[j] == null) {
-                    table[j] = entry;
-                    break;
-                }
+            if (table[indexFor(key.hashCode(), table.length)].getValue()
+                    .equals(entry.getValue())) {
+                rewrite(key, entry);
+            } else {
+                compare(key, entry);
             }
         } else {
-            table[indexFor(key.hashCode(), table.length)] = entry;
+            rewrite(key, entry);
         }
-        size++;
     }
 
     public long get(Integer key) {
-        for (int i = 0; i < size; i++) {
-            if (table[i] != null & table[i].getKey().equals(key)) {
-                return table[i].getValue();
+        for (Entry entry : table) {
+            if (entry != null && entry.getKey().equals(key)) {
+                return entry.getValue();
             }
         }
         return 0;
     }
 
     public int size() {
+        int size = 0;
+        for (Entry entry : table) {
+            if (entry != null) {
+                size++;
+            }
+        }
         return size;
+    }
+
+    private void rewrite(Integer key, Entry entry) {
+        table[indexFor(key.hashCode(), table.length)] = entry;
+    }
+
+    public void compare(Integer key, Entry entry) {
+        for (int i = 0; i < table.length; i++) {
+            if (table[i] != null) {
+                if (entry.getValue().equals(table[i].getValue())) {
+                    rewrite(key, entry);
+                    return;
+                }
+            }
+        }
+        findNewPosition(key, entry);
+    }
+
+    private void findNewPosition(Integer key, Entry entry) {
+        for (int i = indexFor(key.hashCode(), table.length); i < table.length; i++) {
+            if (table[i] == null) {
+                table[i] = entry;
+                return;
+            }
+        }
+        for (int i = 0; i < indexFor(key.hashCode(), table.length); i++) {
+            if (table[i] == null) {
+                table[i] = entry;
+                return;
+            }
+        }
     }
 
     private int indexFor(int hash, int tableLength) {
@@ -40,20 +85,29 @@ public class MyHashMap {
     }
 
     private void changeTableCapacity() {
-        for (int i = 0; i < table.length; i++) {
-            if (table[i] == null) {
-                break;
-            }
-            if (i == table.length - 1) {
+            if (size() == (table.length * LOAD_FACTOR)) {
                 changeCapacity();
-                break;
+            }
+        }
+
+    private void changeCapacity() {
+        Entry[] table = new Entry[CAPACITY * 2];
+        setAllElementsAsNull(table);
+        System.arraycopy(this.table, 0, table, 0, this.table.length);
+        this.table = table.clone();
+        reindexing();
+    }
+
+    private void reindexing() {
+        for (int i = 0; i < table.length; i++) {
+            if (table[i] != null) {
+                int newIndex = indexFor(table[i].getKey().hashCode(), table.length);
+                this.table[newIndex] = table[i];
             }
         }
     }
 
-    private void changeCapacity() {
-        Entry[] table = new Entry[CAPACITY * 2];
-        System.arraycopy(this.table, 0, table, 0, this.table.length);
-        this.table = table.clone();
+    public Entry[] getTable() {
+        return table;
     }
 }
